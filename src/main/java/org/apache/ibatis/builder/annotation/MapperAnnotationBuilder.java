@@ -92,6 +92,9 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.UnknownTypeHandler;
 
 /**
+ * 用于解析 {@link org.apache.ibatis.annotations.Mapper} 的 注解 配置的类,
+ * 在解析的使用会先使用 {@link XMLMapperBuilder} 对 Mapper 对应的 xml 配置进行解析, 见 {@link #parse()} 方法;
+ *
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */
@@ -123,6 +126,9 @@ public class MapperAnnotationBuilder {
     this.type = type;
   }
 
+  /**
+   * 该方法解析对应 Mapper 的 注解 配置, 但是会先使用 {@link XMLMapperBuilder} 对其对应的 XML 配置进行解析;
+   */
   public void parse() {
     String resource = type.toString();
     if (!configuration.isResourceLoaded(resource)) {
