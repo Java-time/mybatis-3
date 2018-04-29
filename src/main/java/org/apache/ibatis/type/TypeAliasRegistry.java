@@ -138,15 +138,26 @@ public class TypeAliasRegistry {
     }
   }
 
+  /**
+   * 注册一个 POJO 的别名, 如果这个 POJO 有 {@link Alias} 注解就用它, 如果没有, 就用 POJO 的 simpleName
+   *
+   * @param type 要注册别名的 POJO {@link Class}
+   */
   public void registerAlias(Class<?> type) {
     String alias = type.getSimpleName();
     Alias aliasAnnotation = type.getAnnotation(Alias.class);
     if (aliasAnnotation != null) {
       alias = aliasAnnotation.value();
-    } 
+    }
     registerAlias(alias, type);
   }
 
+  /**
+   * 使用指定的别名 alias 为 {@link Class} 是 value 的 POJO 注册别名
+   *
+   * @param alias 指定的别名
+   * @param value 要注册别名的 POJO {@link Class}
+   */
   public void registerAlias(String alias, Class<?> value) {
     if (alias == null) {
       throw new TypeException("The parameter alias cannot be null");
@@ -159,6 +170,12 @@ public class TypeAliasRegistry {
     TYPE_ALIASES.put(key, value);
   }
 
+  /**
+   * 使用指定的别名 alias 为类名是 value 的 POJO 注册别名
+   *
+   * @param alias 指定的别名
+   * @param value 要注册别名的 POJO 类名
+   */
   public void registerAlias(String alias, String value) {
     try {
       registerAlias(alias, Resources.classForName(value));
@@ -166,7 +183,7 @@ public class TypeAliasRegistry {
       throw new TypeException("Error registering type alias "+alias+" for "+value+". Cause: " + e, e);
     }
   }
-  
+
   /**
    * @since 3.2.2
    */

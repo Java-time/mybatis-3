@@ -34,6 +34,25 @@ import org.apache.ibatis.reflection.ParamNameUtil;
 import org.apache.ibatis.session.Configuration;
 
 /**
+ * 对应与于 XML 配置中 resultMap 节点的 Java 表示;
+ * 对于 MyBatis DTD 中 resultMap 节点定义的属性和子元素, 该类都有对应的表示方法:
+ *
+ * 1. 属性:
+ * <!ATTLIST resultMap
+ * id CDATA #REQUIRED
+ * type CDATA #REQUIRED
+ * extends CDATA #IMPLIED
+ * autoMapping (true|false) #IMPLIED
+ * >
+ *
+ * 其中常规的使用字段表示, 如 id, type, autoMapping;
+ * 而 extends 属性则在解析的时候就把继承的 ResultMap 也解析合并到本类中了,
+ * 详见 {@link org.apache.ibatis.builder.MapperBuilderAssistant#addResultMap(String, Class, String, Discriminator, List, Boolean)};
+ *
+ * 2. 子元素:
+ * <!ELEMENT resultMap (constructor?,id*,result*,association*,collection*, discriminator?)>
+ *
+ *
  * @author Clinton Begin
  */
 public class ResultMap {
