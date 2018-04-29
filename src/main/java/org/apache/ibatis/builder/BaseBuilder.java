@@ -29,6 +29,12 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
+ * 用于解析 XML 配置文件的基类. 主要的实现类及其功能有以下几个:
+ *
+ * - {@link org.apache.ibatis.builder.xml.XMLConfigBuilder}: 用于解析 mybatis-config.xml 文件;
+ * - {@link org.apache.ibatis.builder.xml.XMLMapperBuilder}: 用于解析 XXXMapper.xml 文件;
+ * - {@link org.apache.ibatis.scripting.xmltags.XMLScriptBuilder}: 用于解析 Mapper 文件中 SQL 的脚本标签, 如 foreach, if 等;
+ *
  * @author Clinton Begin
  */
 public abstract class BaseBuilder {
