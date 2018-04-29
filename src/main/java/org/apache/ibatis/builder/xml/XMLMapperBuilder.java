@@ -48,6 +48,8 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
 /**
+ * 用于解析 {@link org.apache.ibatis.annotations.Mapper} 的 xml 配置的类;
+ *
  * @author Clinton Begin
  */
 public class XMLMapperBuilder extends BaseBuilder {
@@ -238,6 +240,12 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 解析 XML 配置中的所有 resultMap 节点, 详见 {@link #resultMapElement(XNode, List)};
+   *
+   * @param list 要解析的 resultMap 节点
+   * @throws Exception 解析出错的时候
+   */
   private void resultMapElements(List<XNode> list) throws Exception {
     for (XNode resultMapNode : list) {
       try {
@@ -252,6 +260,14 @@ public class XMLMapperBuilder extends BaseBuilder {
     return resultMapElement(resultMapNode, Collections.<ResultMapping> emptyList());
   }
 
+  /**
+   * 解析单个 resultMap 节点;
+   *
+   * @param resultMapNode 要解析的 resultMap 节点
+   * @param additionalResultMappings 已经解析好的 resultMap 节点列表
+   * @return 解析后的 {@link ResultMap}
+   * @throws Exception resultMap 节点不完整(如引用了不存在的 resultMap)或其他异常
+   */
   private ResultMap resultMapElement(XNode resultMapNode, List<ResultMapping> additionalResultMappings) throws Exception {
     ErrorContext.instance().activity("processing " + resultMapNode.getValueBasedIdentifier());
     String id = resultMapNode.getStringAttribute("id",
@@ -382,7 +398,17 @@ public class XMLMapperBuilder extends BaseBuilder {
     JdbcType jdbcTypeEnum = resolveJdbcType(jdbcType);
     return builderAssistant.buildResultMapping(resultType, property, column, javaTypeClass, jdbcTypeEnum, nestedSelect, nestedResultMap, notNullColumn, columnPrefix, typeHandlerClass, flags, resultSet, foreignColumn, lazy);
   }
-  
+
+  /**
+   * 解析嵌套的 {@link ResultMap}, 其中: association 标签, collection 标签, case 标签都是嵌套 ResultMap 的标签类型;
+   *
+   * TODO
+   *
+   * @param context
+   * @param resultMappings
+   * @return
+   * @throws Exception
+   */
   private String processNestedResultMappings(XNode context, List<ResultMapping> resultMappings) throws Exception {
     if ("association".equals(context.getName())
         || "collection".equals(context.getName())

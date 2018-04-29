@@ -27,6 +27,13 @@ import org.apache.ibatis.executor.BatchResult;
  * The primary Java interface for working with MyBatis.
  * Through this interface you can execute commands, get mappers and manage transactions.
  *
+ * MyBatis 中 表示 Sql 会话的基本接口, 可以在该会话上执行基本的 CRUD 操作, 以及事物操作;
+ *
+ * 该类有两个内置的实现类, {@link org.apache.ibatis.session.defaults.DefaultSqlSession} 和 {@link SqlSessionManager}:
+ *
+ * 1. DefaultSqlSession 是非线程安全的;
+ * 2. SqlSessionManager 是线程安全的, 其中使用了代理和 {@link ThreadLocal}, 详见 {@link SqlSessionManager} 注释;
+ *
  * @author Clinton Begin
  */
 public interface SqlSession extends Closeable {
