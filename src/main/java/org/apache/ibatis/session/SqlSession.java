@@ -22,17 +22,46 @@ import java.util.Map;
 
 import org.apache.ibatis.cursor.Cursor;
 import org.apache.ibatis.executor.BatchResult;
+import org.apache.ibatis.executor.Executor;
+import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
 
 /**
  * The primary Java interface for working with MyBatis.
  * Through this interface you can execute commands, get mappers and manage transactions.
  *
- * MyBatis 中 表示 Sql 会话的基本接口, 可以在该会话上执行基本的 CRUD 操作, 以及事物操作;
+ * MyBatis 中 表示 SQL 会话的基本接口, 可以在该会话上执行基本的 CRUD 操作, 以及事物操作;
  *
  * 该类有两个内置的实现类, {@link org.apache.ibatis.session.defaults.DefaultSqlSession} 和 {@link SqlSessionManager}:
  *
  * 1. DefaultSqlSession 是非线程安全的;
  * 2. SqlSessionManager 其中使用了代理和 {@link ThreadLocal}, 详见 {@link SqlSessionManager} 注释;
+ *
+ * 事实上尽管该接口提供了基本 CRUD 操作的方法,
+ * 但是这些 CRUD 操作确是通过 {@link org.apache.ibatis.executor.Executor}
+ * 最终在 {@link org.apache.ibatis.executor.statement.StatementHandler} 中进行的,
+ * (查看 {@link org.apache.ibatis.executor.statement.SimpleStatementHandler} 等实现类可以看得出来这一点);
+ *
+ * 其中值得注意的是 {@link org.apache.ibatis.executor.statement.RoutingStatementHandler} 的实现;
+ * 由于 MyBatis 将语句归为 3 类, 并分别使用处理器来执行和处理结果:
+ * - {@link org.apache.ibatis.executor.statement.SimpleStatementHandler}: 简单的 Statement, 就是臭名昭著的 SQL 注入;
+ * - {@link org.apache.ibatis.executor.statement.PreparedStatementHandler}: PreparedStatement, 先准备语句, 再绑定查询参数;
+ * - {@link org.apache.ibatis.executor.statement.CallableStatementHandler}: 调用数据库存储过程或函数;
+ *
+ * 因此为了更佳方便地根据情况选择 3 种处理器的一种,
+ * MyBatis 引入了 {@link org.apache.ibatis.executor.statement.RoutingStatementHandler}
+ * 来根据不同的语句类型路由到不同的处理器,
+ * 见 {@link org.apache.ibatis.executor.statement.RoutingStatementHandler#RoutingStatementHandler(Executor, MappedStatement, Object, RowBounds, ResultHandler, BoundSql)};
+ *
+ * - 策略模式(Strategy):
+ *   虽然这可以看作是的一种应用: 根据不同的语句类型使用不同的处理算法, 但这种算法在运行时无法动态改变
+ *   ({@link org.apache.ibatis.executor.statement.RoutingStatementHandler#delegate} 为 final),
+ *   因此还不是严格意义的策略模式;
+ *
+ * - 代理模式(Proxy):
+ *   该类是代理模式的一种典型应用: 其本身并不会作逻辑处理, 只是根据语句的类型创建相应的处理器,
+ *   并提供了与这些处理器一模一样的接口(即 {@link org.apache.ibatis.executor.statement.StatementHandler}),
+ *   并将接口的调用委托给实际的处理器;
  *
  * @author Clinton Begin
  */
