@@ -48,6 +48,13 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
 /**
+ * 解析 mybatis-config.xml 配置文件的解析器;
+ * 其中唯一公开的方法 {@link #parse()} 返回解析好的 {@link Configuration}
+ * 对象, 对应于 mybatis-config.xml 文件中的 configuration 节点;
+ *
+ * 除了 mappers 节点的解析引入了另一个解析器 {@link XMLMapperBuilder} 之外 {@link #mapperElement(XNode)},
+ * 解析的过程没有什么特别的地方, 就是把配置文件中的 XML 节点值转换到 {@link Configuration} 类中的字段值;
+ *
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */

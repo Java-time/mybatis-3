@@ -28,6 +28,15 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.transaction.Transaction;
 
 /**
+ * MyBatis 中实际执行 SQL 查询的 Executor 接口;
+ *
+ * 该接口的内置实现类主要有(详见各自的注释):
+ *
+ * - {@link CachingExecutor}: 带缓存的 Executor 实现;
+ * - {@link SimpleExecutor}: 简单的更新/查询语句的实现;
+ * - {@link BatchExecutor}: 执行批量 SQL 语句的实现;
+ * - {@link ReuseExecutor}: 可复用 SQL 查询语句的实现;
+ *
  * @author Clinton Begin
  */
 public interface Executor {

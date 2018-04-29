@@ -32,6 +32,12 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 
 /**
+ * {@link SqlSessionFactory} 的默认实现,
+ * 每个 {@link #openSession()} 方法都会返回一个新的
+ * {@link SqlSession} 实现对象 (具体是 {@link DefaultSqlSession} 对象);
+ *
+ * > SqlSessionFactory 的另一实现是 {@link org.apache.ibatis.session.SqlSessionManager}
+ *
  * @author Clinton Begin
  */
 public class DefaultSqlSessionFactory implements SqlSessionFactory {

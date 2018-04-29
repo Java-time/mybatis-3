@@ -32,7 +32,7 @@ import org.apache.ibatis.executor.BatchResult;
  * 该类有两个内置的实现类, {@link org.apache.ibatis.session.defaults.DefaultSqlSession} 和 {@link SqlSessionManager}:
  *
  * 1. DefaultSqlSession 是非线程安全的;
- * 2. SqlSessionManager 是线程安全的, 其中使用了代理和 {@link ThreadLocal}, 详见 {@link SqlSessionManager} 注释;
+ * 2. SqlSessionManager 其中使用了代理和 {@link ThreadLocal}, 详见 {@link SqlSessionManager} 注释;
  *
  * @author Clinton Begin
  */

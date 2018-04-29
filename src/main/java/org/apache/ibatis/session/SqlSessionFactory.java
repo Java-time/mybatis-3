@@ -19,6 +19,14 @@ import java.sql.Connection;
 
 /**
  * Creates an {@link SqlSession} out of a connection or a DataSource
+ *
+ * {@link SqlSession} 的工厂类接口;
+ * 该接口主要的方法就是 {@link #openSession()} 新建一个 {@link SqlSession};
+ * 该接口的内置实现主要有两个:
+ *
+ * - {@link org.apache.ibatis.session.defaults.DefaultSqlSessionFactory}
+ *
+ * - {@link SqlSessionManager}
  * 
  * @author Clinton Begin
  */
