@@ -38,6 +38,17 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 /**
+ * 映射方法, 即在 XXXMapper 接口中定义的方法在 MyBatis 内部的表示;
+ *
+ * XXXMapper 内的方法无论是使用注解(如 {@link org.apache.ibatis.annotations.Select} 等)进行声明,
+ * 还是在对应的 XML 文件中进行声明, 最终都会被解析成该类的表示形式;
+ *
+ * 该类只有一个公开方法 {@link #execute(SqlSession, Object[])},
+ * 是 MyBatis 根据注解和 XML 配置对接口中声明的抽象方法的具体实现;
+ * 可以猜想到该方法可能会被所声明的 XXXMapper 接口的代理实现所调用,
+ * 查看 {@link MapperProxy#invoke(Object, Method, Object[])}
+ * 验证猜想正确;
+ *
  * @author Clinton Begin
  * @author Eduardo Macarron
  * @author Lasse Voss
