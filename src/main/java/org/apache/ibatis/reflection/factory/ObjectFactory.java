@@ -20,7 +20,20 @@ import java.util.Properties;
 
 /**
  * MyBatis uses an ObjectFactory to create all needed new Objects.
- * 
+ *
+ * 对象工厂接口, MyBatis 用于在运行时创建所有所需的新对象, 典型的情况是当查询数据库返回后需要将
+ * 查询结果映射成 POJO , 此时就会使用这个工厂类来创建, 使用的原理是反射(reflect);
+ *
+ * 该接口主要的方法为:
+ * - {@link #create(Class)}: 使用默认构造函数创建对象,
+ * 当我们定义的 POJO 类中含有默认构造函数的时候, MyBatis 就可以调用这个方法来新建对象;
+ *
+ * - {@link #create(Class, List, List)}: 使用特定的构造函数和构造函数参数创建对象,
+ * 当我们在 XXXMapper.xml 文件中的 resultMap 节点中定义了子节点 constructor 的时候,
+ * MyBatis 在最终数据库返回结果并转化为 POJO 时就会调用这个构造函数进行创建对象;
+ *
+ * 该接口的内置实现类只有 {@link DefaultObjectFactory};
+ *
  * @author Clinton Begin
  */
 public interface ObjectFactory {
