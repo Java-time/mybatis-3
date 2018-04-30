@@ -28,6 +28,25 @@ import org.apache.ibatis.reflection.ExceptionUtil;
 import org.apache.ibatis.session.SqlSession;
 
 /**
+ * Mapper 的代理实现;
+ *
+ * 在 MyBatis 中, 我们所定义的 XXXMapper 都是接口, 其中定义的方法也都是抽象方法,
+ * 但最终我们还是可以获得所定义的 XXXMapper 接口的具体实现对象
+ * (通过 {@link SqlSession#getMapper(Class)}), 并调用我们前面声明的抽象方法,
+ * 其中 MyBatis 必定为我们提供了实现了这些接口的类, 并实现其方法, 另一种方法就是使用
+ * 代理, 即该类的作用;
+ *
+ * 该类作为 XXXMapper 接口的代理实现, 并没有对 XXXMapper 中的每一个方法都自己进行
+ * 解析和执行, 而是使用 {@link MapperMethod} 对 XXXMapper 中的每一个方法进行解析
+ * 和实现, 然后在 XXXMapper 的方法(即该类的 {@link #invoke(Object, Method, Object[])} 方法)被调用的时候,
+ * 将方法的执行委托给 {@link MapperMethod#execute(SqlSession, Object[])}
+ * 进行执行;
+ *
+ * 值得注意的是:
+ * - 由于所有类都继承自 Object 类, 如果在 XXXMapper 上调用 Object 的方法, 此时不应该被代理;
+ * - 自 Java 8 开始, 接口中允许默认方法(default method), 如果该方法是默认方法, 此时也不应该被代理;
+ * 详见 {@link #invoke(Object, Method, Object[])}
+ *
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
