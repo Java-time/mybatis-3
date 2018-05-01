@@ -35,6 +35,8 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 
 /**
+ * 用于创建 {@link Cache} 对象和为其添加装饰器的便捷工具;
+ *
  * @author Clinton Begin
  */
 public class CacheBuilder {

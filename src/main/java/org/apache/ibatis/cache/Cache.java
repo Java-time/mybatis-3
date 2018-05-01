@@ -65,6 +65,8 @@ import java.util.concurrent.locks.ReadWriteLock;
  * - {@link org.apache.ibatis.cache.decorators.FifoCache}: 基于"先进先出"算法的缓存;
  * - {@link org.apache.ibatis.cache.decorators.ScheduledCache}: 定时刷新的缓存;
  *
+ * {@link Cache} 接口的实现将会在 {@link org.apache.ibatis.executor.CachingExecutor} 中是被使用到;
+ *
  * @author Clinton Begin
  */
 

@@ -24,6 +24,8 @@ import org.apache.ibatis.cache.Cache;
 /**
  * FIFO (first in, first out) cache decorator
  *
+ * 参考 {@link Cache}, {@link SoftCache}, 和 {@link LruCache};
+ *
  * @author Clinton Begin
  */
 public class FifoCache implements Cache {
