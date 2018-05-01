@@ -15,6 +15,10 @@
  */
 /**
  * Contains all the annotation that are used in mapper interfaces
+ *
+ * 该 Java 包下的所有注解都是用于配置 XXXMapper 接口的, 因此此包下的所有注解都是在
+ * {@link org.apache.ibatis.builder.annotation.MapperAnnotationBuilder}
+ * 中被解析, 详情可直接看 {@link org.apache.ibatis.builder.annotation.MapperAnnotationBuilder};
  */
 package org.apache.ibatis.annotations;
 
