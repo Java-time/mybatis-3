@@ -36,6 +36,35 @@ import java.util.concurrent.locks.ReadWriteLock;
  * }
  * </pre>
  *
+ * MyBatis 用于缓存的接口, 除了具备常见缓存接口的几个方法:
+ *
+ * - {@link #putObject(Object, Object)}: 将对象放入缓存;
+ * - {@link #getObject(Object)}: 从缓存取出数据;
+ * - {@link #removeObject(Object)}: 将数据从缓存删除;
+ *
+ * 该接口还要求缓存必须有一个 id,
+ * 而 MyBatis 将会使用 Mapper 的命名空间(通常就是类的全限定名)作为 id
+ * 作为构造函数参数来构建缓存;
+ *
+ * 构建完 Cache 之后可以通过 {@link org.apache.ibatis.session.Configuration#addCache(Cache)} 方法
+ * 添加缓存管理器到配置中, 相同 id (即命名空间) 的缓存只会被添加到 Configuration 中一次,
+ * 这是通过自定义的 Map {@link org.apache.ibatis.session.Configuration.StrictMap} 实现的;
+ *
+ * {@link Cache} 的实现中最重要的是
+ *
+ * - {@link org.apache.ibatis.cache.impl.PerpetualCache}: 顾名思义, 这是一个永久缓存,
+ * 除非手动删除其中的数据, 否则都会一直保存在缓存中; 其内部仅仅组合了一个 HashMap 字段, 再加上
+ * id 字段而已;
+ *
+ * {@link Cache} 还有一些基于 {@link org.apache.ibatis.cache.impl.PerpetualCache},
+ * 使用装饰者模式的实现类:
+ *
+ * - {@link org.apache.ibatis.cache.decorators.SoftCache}: 软引用缓存;
+ * - {@link org.apache.ibatis.cache.decorators.WeakCache}: 弱引用缓存;
+ * - {@link org.apache.ibatis.cache.decorators.LruCache}: 基于"最近最少使用"算法的缓存;
+ * - {@link org.apache.ibatis.cache.decorators.FifoCache}: 基于"先进先出"算法的缓存;
+ * - {@link org.apache.ibatis.cache.decorators.ScheduledCache}: 定时刷新的缓存;
+ *
  * @author Clinton Begin
  */
 

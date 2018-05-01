@@ -26,7 +26,9 @@ import org.apache.ibatis.cache.Cache;
 /**
  * Weak Reference cache decorator.
  * Thanks to Dr. Heinz Kabutz for his guidance here.
- * 
+ *
+ * 详见 {@link SoftCache};
+ *
  * @author Clinton Begin
  */
 public class WeakCache implements Cache {
