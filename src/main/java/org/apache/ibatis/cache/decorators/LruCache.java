@@ -24,12 +24,20 @@ import org.apache.ibatis.cache.Cache;
 /**
  * Lru (least recently used) cache decorator
  *
+ * 该类是基于 "最近最少使用" (LRU) 算法进行实现的缓存, 毫无疑问用到了 {@link LinkedHashMap},
+ * 重点的字段在于 {@link #eldestKey};
+ *
  * @author Clinton Begin
  */
 public class LruCache implements Cache {
 
   private final Cache delegate;
   private Map<Object, Object> keyMap;
+  /**
+   * eldestKey 保存到目前为止最旧的一个 key, 在每次进行 {@link #putObject(Object, Object)} 操作的时候,
+   * 都会调用 {@link #cycleKeyList(Object)} 进行清理最旧的对象, 由于每一次的 put 操作都会
+   * 调用 {@link #cycleKeyList(Object)} 方法, 因此每次只需要清除最旧的那一个对象(如果有的话)就行了;
+   */
   private Object eldestKey;
 
   public LruCache(Cache delegate) {
