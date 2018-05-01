@@ -19,9 +19,24 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.ArrayUtil;
+import org.apache.ibatis.session.RowBounds;
 
 /**
+ * MyBatis 用于作为缓存的 Key 值的内部表示;
+ *
+ * 要作为 Key 值, 判断其相等性至关重要, 在 Java 中体现为 {@link #equals(Object)} 方法
+ * 和 {@link #hashCode()} 方法, 因此该类重写了这两个方法;
+ *
+ * 在 MyBatis 中, 要想把数据库查询结果缓存起来, 其 Key 值的生成涉及到多个方面, 其中最重要的
+ * 包含: 1 SQL 语句(可使用映射方法 id); 2 SQL 语句参数; 其中语句参数的数量不确定, 因此需要
+ * 一步步更新其缓存 Key 值的 hashCode, 这就是该类中的 {@link #hashcode} 字段 和 {@link #update(Object)} 函数的作用;
+ *
+ * 关于该类的使用, 参考:
+ * {@link org.apache.ibatis.executor.BaseExecutor#createCacheKey(MappedStatement, Object, RowBounds, BoundSql)}
+ *
  * @author Clinton Begin
  */
 public class CacheKey implements Cloneable, Serializable {
