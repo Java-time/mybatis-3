@@ -92,7 +92,7 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.UnknownTypeHandler;
 
 /**
- * 用于解析 {@link org.apache.ibatis.annotations.Mapper} 的 注解 配置的类,
+ * 用于解析 {@link org.apache.ibatis.annotations.Mapper} 的注解,
  * 在解析的使用会先使用 {@link XMLMapperBuilder} 对 Mapper 对应的 xml 配置进行解析, 见 {@link #parse()} 方法;
  *
  * @author Clinton Begin
