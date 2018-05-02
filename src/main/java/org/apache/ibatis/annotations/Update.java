@@ -22,6 +22,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 指定 Mapper 方法对应的 update 语句的注解;
+ *
+ * 详见: {@link Delete} 文档;
+ *
  * @author Clinton Begin
  */
 @Documented

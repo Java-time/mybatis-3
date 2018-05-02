@@ -22,6 +22,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 使用 SQL 生成器生成 Mapper 方法对应的 insert 语句;
+ *
+ * 详见: {@link Delete} 文档;
+ *
  * @author Clinton Begin
  */
 @Documented
