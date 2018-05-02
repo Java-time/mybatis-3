@@ -43,12 +43,32 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.binding.MapperMethod.ParamMap;
 import org.apache.ibatis.io.ResolverUtil;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.reflection.Jdk;
 
 /**
+ * 该类表示了一个类型处理器 {@link TypeHandler} 的注册表;
+ *
+ * 为了方便地根据各种情况来寻找类型处理器, 该类维护了 3 个 {@link Map}:
+ *
+ * - {@link #JDBC_TYPE_HANDLER_MAP}: key 为 {@link JdbcType}, value 为 {@link TypeHandler}, 根据 Jdbc 类型获取类型处理器;
+ *   由于 Jdbc 类型是固定的, 该字段的具体实现用到 {@link EnumMap}, 节省内存; 此字段更多是在将数据库返回结果解析为 Java 对象时用到;
+ *
+ * - {@link #TYPE_HANDLER_MAP}: key 为 {@link Type}, value 为一个 (JdbcType, TypeHandler) 的 {@link Map}, 原因是不同的
+ *   {@link JdbcType} 可能可以转换成同样的 Java 类型, 但是转换方式可能不一致, 这是需要的 {@link TypeHandler} 也就不一致;
+ *   此字段更多是在将 Java 对象设置到 PreparedStatement 中使用到;
+ *
+ *   > 以上例子包括: 可能想让 {@link JdbcType#TIMESTAMP} 和 {@link JdbcType#TIME} 都转换成 {@link Date}, 此时则需要注册两个
+ *     {@link TypeHandler};
+ *
+ * - {@link #ALL_TYPE_HANDLERS_MAP}: key 为 {@link TypeHandler} 的 {@link Class} 对象, value 为 {@link TypeHandler} 对象,
+ *   方便通过 {@link TypeHandler} 类型直接获取 {@link TypeHandler} 对象, 此时表现得像是一个缓存, 不必每次都新建对象; 此字段更多
+ *   是在指定自定义类型处理器时用到, 如 XXXMapper.xml 中使用 parameterMap 节点,
+ *   或在注解中指定类型处理器 {@link Result#typeHandler()};
+ *
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */
