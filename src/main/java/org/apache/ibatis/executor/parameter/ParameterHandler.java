@@ -17,9 +17,18 @@ package org.apache.ibatis.executor.parameter;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * A parameter handler sets the parameters of the {@code PreparedStatement}
+ *
+ * 参数处理器, 用于往 {@link PreparedStatement} 中设置参数,
+ * 参数处理器一般由语句处理器 {@link org.apache.ibatis.executor.statement.StatementHandler} 持有,
+ * 在语句处理器执行实际处理语句前会先调用其
+ * {@link org.apache.ibatis.executor.statement.StatementHandler#parameterize(Statement)} 方法,
+ * 把参数都设置进去, 因此可以断定 {@link org.apache.ibatis.executor.statement.SimpleStatementHandler}
+ * 中的 {@link org.apache.ibatis.executor.statement.SimpleStatementHandler#parameterize(Statement)} 方法是空,
+ * 因为其不需要设置参数;
  *
  * @author Clinton Begin
  */
