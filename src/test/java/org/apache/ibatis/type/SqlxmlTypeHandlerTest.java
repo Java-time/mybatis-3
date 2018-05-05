@@ -17,17 +17,18 @@
 package org.apache.ibatis.type;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.io.Reader;
 import java.nio.file.Paths;
 import java.sql.Connection;
+import java.sql.SQLXML;
 import java.util.Collections;
 
+import org.apache.ibatis.BaseDataTest;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
-import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.jdbc.ScriptRunner;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
@@ -40,14 +41,22 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import org.mockito.Mock;
 import ru.yandex.qatools.embed.postgresql.EmbeddedPostgres;
 import ru.yandex.qatools.embed.postgresql.util.SocketUtil;
 
 @Category(EmbeddedPostgresqlTests.class)
-public class SqlxmlTypeHandlerTest {
+public class SqlxmlTypeHandlerTest extends BaseTypeHandlerTest {
+  private static final TypeHandler<String> TYPE_HANDLER = new SqlxmlTypeHandler();
   private static final EmbeddedPostgres postgres = new EmbeddedPostgres();
 
   private static SqlSessionFactory sqlSessionFactory;
+
+  @Mock
+  private SQLXML sqlxml;
+
+  @Mock
+  private Connection connection;
 
   @BeforeClass
   public static void setUp() throws Exception {
@@ -60,18 +69,11 @@ public class SqlxmlTypeHandlerTest {
     Environment environment = new Environment("development", new JdbcTransactionFactory(), new UnpooledDataSource(
         "org.postgresql.Driver", url, null));
     configuration.setEnvironment(environment);
-    configuration.setUseGeneratedKeys(true);
     configuration.addMapper(Mapper.class);
     sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
 
-    try (SqlSession session = sqlSessionFactory.openSession();
-        Connection conn = session.getConnection();
-        Reader reader = Resources
-            .getResourceAsReader("org/apache/ibatis/type/SqlxmlTypeHandlerTest.sql")) {
-      ScriptRunner runner = new ScriptRunner(conn);
-      runner.setLogWriter(null);
-      runner.runScript(reader);
-    }
+    BaseDataTest.runScript(sqlSessionFactory.getConfiguration().getEnvironment().getDataSource(),
+            "org/apache/ibatis/type/SqlxmlTypeHandlerTest.sql");
   }
 
   @AfterClass
@@ -79,59 +81,106 @@ public class SqlxmlTypeHandlerTest {
     postgres.stop();
   }
 
+  @Override
   @Test
-  public void shouldReturnXmlAsString() throws Exception {
-    SqlSession session = sqlSessionFactory.openSession();
-    try {
+  public void shouldSetParameter() throws Exception {
+    when(connection.createSQLXML()).thenReturn(sqlxml);
+    when(ps.getConnection()).thenReturn(connection);
+    String xml = "<message>test</message>";
+    TYPE_HANDLER.setParameter(ps, 1, xml, null);
+    verify(ps).setSQLXML(1, sqlxml);
+    verify(sqlxml).setString(xml);
+    verify(sqlxml).free();
+  }
+
+  @Override
+  @Test
+  public void shouldGetResultFromResultSetByName() throws Exception {
+    String xml = "<message>test</message>";
+    when(sqlxml.getString()).thenReturn(xml);
+    when(rs.getSQLXML("column")).thenReturn(sqlxml);
+    assertEquals(xml, TYPE_HANDLER.getResult(rs, "column"));
+    verify(sqlxml).free();
+  }
+
+  @Override
+  @Test
+  public void shouldGetResultNullFromResultSetByName() throws Exception {
+    when(rs.getSQLXML("column")).thenReturn(null);
+    assertNull(TYPE_HANDLER.getResult(rs, "column"));
+  }
+
+  @Override
+  @Test
+  public void shouldGetResultFromResultSetByPosition() throws Exception {
+    String xml = "<message>test</message>";
+    when(sqlxml.getString()).thenReturn(xml);
+    when(rs.getSQLXML(1)).thenReturn(sqlxml);
+    assertEquals(xml, TYPE_HANDLER.getResult(rs, 1));
+    verify(sqlxml).free();
+  }
+
+  @Override
+  @Test
+  public void shouldGetResultNullFromResultSetByPosition() throws Exception {
+    when(rs.getSQLXML(1)).thenReturn(null);
+    assertNull(TYPE_HANDLER.getResult(rs, 1));
+  }
+
+  @Override
+  @Test
+  public void shouldGetResultFromCallableStatement() throws Exception {
+    String xml = "<message>test</message>";
+    when(sqlxml.getString()).thenReturn(xml);
+    when(cs.getSQLXML(1)).thenReturn(sqlxml);
+    assertEquals(xml, TYPE_HANDLER.getResult(cs, 1));
+    verify(sqlxml).free();
+  }
+
+  @Override
+  @Test
+  public void shouldGetResultNullFromCallableStatement() throws Exception {
+    when(cs.getSQLXML(1)).thenReturn(null);
+    assertNull(TYPE_HANDLER.getResult(cs, 1));
+  }
+
+  @Test
+  public void shouldReturnXmlAsString() {
+    try (SqlSession session = sqlSessionFactory.openSession()) {
       Mapper mapper = session.getMapper(Mapper.class);
       XmlBean bean = mapper.select(1);
       assertEquals("<title>XML data</title>",
           bean.getContent());
-    } finally {
-      session.close();
     }
   }
 
   @Test
-  public void shouldReturnNull() throws Exception {
-    SqlSession session = sqlSessionFactory.openSession();
-    try {
+  public void shouldReturnNull() {
+    try (SqlSession session = sqlSessionFactory.openSession()) {
       Mapper mapper = session.getMapper(Mapper.class);
       XmlBean bean = mapper.select(2);
       assertNull(bean.getContent());
-    } finally {
-      session.close();
     }
   }
 
   @Test
-  public void shouldInsertXmlString() throws Exception {
+  public void shouldInsertXmlString() {
     final Integer id = 100;
     final String content = "<books><book><title>Save XML</title></book><book><title>Get XML</title></book></books>";
     // Insert
-    {
-      SqlSession session = sqlSessionFactory.openSession();
-      try {
-        Mapper mapper = session.getMapper(Mapper.class);
-        XmlBean bean = new XmlBean();
-        bean.setId(id);
-        bean.setContent(content);
-        mapper.insert(bean);
-        session.commit();
-      } finally {
-        session.close();
-      }
+    try (SqlSession session = sqlSessionFactory.openSession()) {
+      Mapper mapper = session.getMapper(Mapper.class);
+      XmlBean bean = new XmlBean();
+      bean.setId(id);
+      bean.setContent(content);
+      mapper.insert(bean);
+      session.commit();
     }
     // Select to verify
-    {
-      SqlSession session = sqlSessionFactory.openSession();
-      try {
-        Mapper mapper = session.getMapper(Mapper.class);
-        XmlBean bean = mapper.select(id);
-        assertEquals(content, bean.getContent());
-      } finally {
-        session.close();
-      }
+    try (SqlSession session = sqlSessionFactory.openSession()) {
+      Mapper mapper = session.getMapper(Mapper.class);
+      XmlBean bean = mapper.select(id);
+      assertEquals(content, bean.getContent());
     }
   }
 

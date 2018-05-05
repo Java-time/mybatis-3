@@ -57,12 +57,14 @@ public class ClobReaderTypeHandlerTest extends BaseTypeHandlerTest {
   @BeforeClass
   public static void setupSqlSessionFactory() throws Exception {
     DataSource dataSource = BaseDataTest.createUnpooledDataSource("org/apache/ibatis/type/jdbc.properties");
-    BaseDataTest.runScript(dataSource, "org/apache/ibatis/type/ClobReaderTypeHandlerTest.sql");
     TransactionFactory transactionFactory = new JdbcTransactionFactory();
     Environment environment = new Environment("Production", transactionFactory, dataSource);
     Configuration configuration = new Configuration(environment);
     configuration.addMapper(Mapper.class);
     sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
+
+    BaseDataTest.runScript(sqlSessionFactory.getConfiguration().getEnvironment().getDataSource(),
+            "org/apache/ibatis/type/ClobReaderTypeHandlerTest.sql");
   }
 
   @Override
@@ -122,9 +124,7 @@ public class ClobReaderTypeHandlerTest extends BaseTypeHandlerTest {
 
   @Test
   public void integrationTest() throws IOException {
-    SqlSession session = sqlSessionFactory.openSession();
-
-    try {
+    try (SqlSession session = sqlSessionFactory.openSession()) {
       Mapper mapper = session.getMapper(Mapper.class);
       // insert (Reader -> Clob)
       {
@@ -139,8 +139,6 @@ public class ClobReaderTypeHandlerTest extends BaseTypeHandlerTest {
         ClobContent clobContent = mapper.findOne(1);
         assertThat(new BufferedReader(clobContent.getContent()).readLine()).isEqualTo("Hello");
       }
-    } finally {
-      session.close();
     }
 
   }
