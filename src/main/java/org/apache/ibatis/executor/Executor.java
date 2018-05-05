@@ -23,6 +23,7 @@ import org.apache.ibatis.cursor.Cursor;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.transaction.Transaction;
@@ -36,6 +37,10 @@ import org.apache.ibatis.transaction.Transaction;
  * - {@link SimpleExecutor}: 简单的更新/查询语句的实现;
  * - {@link BatchExecutor}: 执行批量 SQL 语句的实现;
  * - {@link ReuseExecutor}: 可复用 SQL 查询语句的实现;
+ *
+ * {@link org.apache.ibatis.session.Configuration#newExecutor(Transaction, ExecutorType)} 方法
+ * 会根据指定的 {@link ExecutorType} 新建对应的 {@link Executor} 对象, 如果配置了 cacheEnabled 的话,
+ * 则会再使用 {@link CachingExecutor} 对已有的 {@link Executor} 进行装饰, 此处使用了装饰者模式;
  *
  * @author Clinton Begin
  */

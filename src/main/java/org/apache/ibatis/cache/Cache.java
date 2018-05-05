@@ -15,6 +15,9 @@
  */
 package org.apache.ibatis.cache;
 
+import org.apache.ibatis.builder.annotation.MapperAnnotationBuilder;
+import org.apache.ibatis.parsing.XNode;
+
 import java.util.concurrent.locks.ReadWriteLock;
 
 /**
@@ -64,6 +67,18 @@ import java.util.concurrent.locks.ReadWriteLock;
  * - {@link org.apache.ibatis.cache.decorators.LruCache}: 基于"最近最少使用"算法的缓存;
  * - {@link org.apache.ibatis.cache.decorators.FifoCache}: 基于"先进先出"算法的缓存;
  * - {@link org.apache.ibatis.cache.decorators.ScheduledCache}: 定时刷新的缓存;
+ *
+ * 创建:
+ *
+ * - 使用 XML 配置缓存时, {@link org.apache.ibatis.builder.xml.XMLMapperBuilder#cacheElement(XNode)}
+ *   会解析对应的 cache 节点, 如果还不存在, 会先使用 {@link org.apache.ibatis.mapping.CacheBuilder}
+ *   创建一个 {@link Cache} 的实现类对象, 使用其命名空间添加到 {@link org.apache.ibatis.session.Configuration};
+ *
+ * - 使用注解配置缓存时, {@link MapperAnnotationBuilder#parseCache()} 方法会解析对应的
+ *   {@link org.apache.ibatis.annotations.CacheNamespace} 注解, 然后同样新建 {@link Cache},
+ *   使用其命名空间添加到 {@link org.apache.ibatis.session.Configuration};
+ *
+ * 使用:
  *
  * {@link Cache} 接口的实现将会在 {@link org.apache.ibatis.executor.CachingExecutor} 中是被使用到;
  *
