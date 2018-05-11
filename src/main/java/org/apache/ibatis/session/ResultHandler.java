@@ -23,10 +23,16 @@ import org.apache.ibatis.executor.result.DefaultResultHandler;
  * 映射回 Java 对象后, 发现映射函数有 {@link ResultHandler} 参数时, 会将处理结果 "存储" 在一个
  * {@link ResultContext} 对象中, 然后会使用该 {@link ResultContext} 对象回调 Mapper 函数中的 {@link ResultHandler} 对象;
  *
- * MyBatis 内置该类的实现是 {@link org.apache.ibatis.executor.result.DefaultResultHandler}, 在 Mapper 函数返回值定义为
- * 非 void 的时候, MyBatis 会先使用 {@link DefaultResultHandler#handleResult(ResultContext)}
- * 方法将结果集存储为 {@link java.util.List} 结构, 然后使用 {@link DefaultResultHandler#getResultList()} 把结果取出,
- * 再返回;
+ * MyBatis 内置该类的实现是:
+ *
+ * - {@link org.apache.ibatis.executor.result.DefaultResultHandler}: 在 Mapper 函数返回值定义为
+ *   {@link java.util.Collection} 或其子类的时候, MyBatis 会先使用 {@link DefaultResultHandler#handleResult(ResultContext)}
+ *   方法将结果集存储为 {@link java.util.List} 结构, 然后使用 {@link DefaultResultHandler#getResultList()} 把结果取出,
+ *   再返回;
+ *
+ * - {@link org.apache.ibatis.executor.result.DefaultMapResultHandler}: 在 Mapper 函数返回值定义为 {@link java.util.Map} 或
+ *   其子类时, MyBatis 或利用 Mapper 函数的 {@link org.apache.ibatis.annotations.MapKey} 注解将返回结果映射成为 {@link java.util.Map}
+ *   类型;
  *
  * 具体例子见: src/test/java/org/apache/ibatis/submitted/nestedresulthandler_association/NestedResultHandlerAssociationTest.java
  *
